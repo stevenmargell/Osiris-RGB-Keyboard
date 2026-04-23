@@ -66,6 +66,7 @@ EOF
 
 chmod +x install_rgb.sh
 ./install_rgb.sh
+```
 
 ## Technical Logic: How it Works
 
