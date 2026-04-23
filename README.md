@@ -13,20 +13,36 @@ sudo apt install -y build-essential cmake libftdi1-dev libusb-1.0-0-dev git
 
 echo "Building ectool from source..."
 if [ -d "ectool" ]; then rm -rf ectool; fi
-git clone [https://github.com/DHowett/ectool.git](https://github.com/DHowett/ectool.git)
-cd ectool && mkdir build && cd build
+git clone https://github.com/DHowett/ectool.git
+cd ectool
+
+# FORCE OVERWRITE the first lines of CMakeLists.txt to satisfy modern CMake
+echo "cmake_minimum_required(VERSION 3.10)" > CMakeLists.txt.new
+echo "project(ectool C)" >> CMakeLists.txt.new
+tail -n +3 CMakeLists.txt >> CMakeLists.txt.new
+mv CMakeLists.txt.new CMakeLists.txt
+
+mkdir build && cd build
 cmake .. && make
-sudo cp ectool /usr/local/bin/ectool
-sudo chmod +x /usr/local/bin/ectool
+
+if [ -f "src/ectool" ]; then
+    sudo cp src/ectool /usr/local/bin/ectool
+    sudo chmod +x /usr/local/bin/ectool
+    echo "ectool built and installed successfully."
+else
+    echo "ERROR: ectool binary not found in src/ folder."
+    exit 1
+fi
 cd ../..
 
 echo "Creating /usr/local/bin/rainbow..."
 cat << 'OUTER_EOF' | sudo tee /usr/local/bin/rainbow
 #!/bin/bash
+# Ensure driver is loaded
 modprobe cros_ec_lpcs 2>/dev/null
+# All commands to the EC require sudo/root privileges
 /usr/local/bin/ectool rgbkbd demo 0
 /usr/local/bin/ectool pwmsetkblight 100
-# Zone Anchors: 1(Red), 5(Yellow), 9(Green), 12(Blue)
 /usr/local/bin/ectool rgbkbd 1 16711680
 /usr/local/bin/ectool rgbkbd 5 16776960
 /usr/local/bin/ectool rgbkbd 9 65280
@@ -61,7 +77,8 @@ esac
 OUTER_EOF
 sudo chmod +x /usr/lib/systemd/system-sleep/rainbow-resume
 
-echo "Installation Complete! Run 'rainbow' to activate."
+echo "Installation Complete! Running rainbow with sudo..."
+sudo /usr/local/bin/rainbow
 EOF
 
 chmod +x install_rgb.sh
