@@ -1,14 +1,11 @@
-# Osiris-RGB-Keyboard
+# Acer 516 GE (Osiris) RGB Keyboard Linux Controller
 Script to get rainbow effect on keyboard of Acer 516 GE (Osiris) Chromebook running Ubuntu 26.04
 
 ## Installation Instructions
 curl -s https://raw.githubusercontent.com/stevenmargell/osiris-rgb/main/install_rgb.sh | bash
 
-# Acer 516 GE (Osiris) RGB Keyboard Linux Controller
 
-This guide and script provide full RGB control for the Acer 516 GE (Osiris) Chromebook running Ubuntu/Linux. 
-
-## 🧠 Technical Logic: How it Works
+## Technical Logic: How it Works
 
 The Acer 516 GE uses a unique Embedded Controller (EC) mapping that differs from standard RGB keyboards:
 
@@ -18,13 +15,13 @@ The Acer 516 GE uses a unique Embedded Controller (EC) mapping that differs from
     * *Formula:* $(R \times 65536) + (G \times 256) + B$.
 * **Priority Override:** Hardware-level animations (Demo Mode) take priority. Manual colors only work if `demo 0` is sent first.
 
-## 🛠 Why this `ectool` version?
+## Why this `ectool` version?
 
 Not all `ectool` binaries are equal. This setup compiles the source from **DHowett**, which is specifically compatible with the `rgbkbd` subcommands required for multi-zone Chromebook boards. Compiling locally prevents "Protocol Mismatch" errors found in generic pre-compiled binaries.
 
 ---
 
-## 🎨 Solid Color Reference
+## Solid Color Reference
 To set the **whole keyboard** to one color, use: `sudo ectool rgbkbd 0 [Value]`
 
 | Color | Decimal Value | Command |
