@@ -2,7 +2,7 @@
 Script to get rainbow effect on keyboard of Acer 516 GE (Osiris) Chromebook running Ubuntu 26.04
 
 ## Installation Instructions
-curl -s https://raw.githubusercontent.com/stevenmargell/osiris-rgb/main/install_rgb.sh | bash
+curl -s [https://raw.githubusercontent.com/stevenmargell/osiris-rgb/main/install_rgb.sh](https://raw.githubusercontent.com/stevenmargell/Osiris-RGB-Keyboard/refs/heads/main/install_rgb.sh) | bash
 
 
 ## Technical Logic: How it Works
