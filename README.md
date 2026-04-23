@@ -2,8 +2,70 @@
 Script to get rainbow effect on keyboard of Acer 516 GE (Osiris) Chromebook running Ubuntu 26.04
 
 ## Installation Instructions
-curl -s [https://raw.githubusercontent.com/stevenmargell/osiris-rgb/main/install_rgb.sh](https://raw.githubusercontent.com/stevenmargell/Osiris-RGB-Keyboard/refs/heads/main/install_rgb.sh) | bash
+Copy the entire block below and paste it into your terminal. This creates a local installation script, makes it executable, and runs it to set up the drivers, rainbow script, and boot automation.
 
+```bash
+cat << 'EOF' > install_rgb.sh
+#!/bin/bash
+echo "Starting Osiris RGB Setup..."
+sudo apt update
+sudo apt install -y build-essential cmake libftdi1-dev libusb-1.0-0-dev git
+
+echo "Building ectool from source..."
+if [ -d "ectool" ]; then rm -rf ectool; fi
+git clone [https://github.com/DHowett/ectool.git](https://github.com/DHowett/ectool.git)
+cd ectool && mkdir build && cd build
+cmake .. && make
+sudo cp ectool /usr/local/bin/ectool
+sudo chmod +x /usr/local/bin/ectool
+cd ../..
+
+echo "Creating /usr/local/bin/rainbow..."
+cat << 'OUTER_EOF' | sudo tee /usr/local/bin/rainbow
+#!/bin/bash
+modprobe cros_ec_lpcs 2>/dev/null
+/usr/local/bin/ectool rgbkbd demo 0
+/usr/local/bin/ectool pwmsetkblight 100
+# Zone Anchors: 1(Red), 5(Yellow), 9(Green), 12(Blue)
+/usr/local/bin/ectool rgbkbd 1 16711680
+/usr/local/bin/ectool rgbkbd 5 16776960
+/usr/local/bin/ectool rgbkbd 9 65280
+/usr/local/bin/ectool rgbkbd 12 255
+OUTER_EOF
+sudo chmod +x /usr/local/bin/rainbow
+
+echo "Configuring boot-time automation..."
+cat << 'OUTER_EOF' | sudo tee /etc/systemd/system/keyboard-rgb.service
+[Unit]
+Description=Set Keyboard RGB Rainbow at Boot
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/rainbow
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+OUTER_EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable keyboard-rgb.service
+
+echo "Configuring wake-from-sleep hook..."
+cat << 'OUTER_EOF' | sudo tee /usr/lib/systemd/system-sleep/rainbow-resume
+#!/bin/sh
+case $1 in
+  post) /usr/local/bin/rainbow ;;
+esac
+OUTER_EOF
+sudo chmod +x /usr/lib/systemd/system-sleep/rainbow-resume
+
+echo "Installation Complete! Run 'rainbow' to activate."
+EOF
+
+chmod +x install_rgb.sh
+./install_rgb.sh
 
 ## Technical Logic: How it Works
 
