@@ -9,7 +9,8 @@ cat << 'EOF' > install_rgb.sh
 #!/bin/bash
 echo "Starting Osiris RGB Setup..."
 sudo apt update
-sudo apt install -y build-essential cmake libftdi1-dev libusb-1.0-0-dev git
+# Added pkg-config to the list below
+sudo apt install -y build-essential cmake pkg-config libftdi1-dev libusb-1.0-0-dev git
 
 echo "Building ectool from source..."
 if [ -d "ectool" ]; then rm -rf ectool; fi
@@ -25,14 +26,18 @@ mv CMakeLists.txt.new CMakeLists.txt
 mkdir build && cd build
 cmake .. && make
 
+# Note: Depending on the version of ectool, the binary might be in 'build/' or 'build/src/'
 if [ -f "src/ectool" ]; then
     sudo cp src/ectool /usr/local/bin/ectool
-    sudo chmod +x /usr/local/bin/ectool
-    echo "ectool built and installed successfully."
+elif [ -f "ectool" ]; then
+    sudo cp ectool /usr/local/bin/ectool
 else
-    echo "ERROR: ectool binary not found in src/ folder."
+    echo "ERROR: ectool binary not found."
     exit 1
 fi
+
+sudo chmod +x /usr/local/bin/ectool
+echo "ectool built and installed successfully."
 cd ../..
 
 echo "Creating /usr/local/bin/rainbow..."
