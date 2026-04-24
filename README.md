@@ -47,7 +47,7 @@ cat << 'OUTER_EOF' | sudo tee /usr/local/bin/rainbow
 modprobe cros_ec_lpcs 2>/dev/null
 # All commands to the EC require sudo/root privileges
 /usr/local/bin/ectool rgbkbd demo 0
-/usr/local/bin/ectool pwmsetkblight 100
+/usr/local/bin/ectool pwmsetkblight 50
 /usr/local/bin/ectool rgbkbd 1 16711680
 /usr/local/bin/ectool rgbkbd 5 16776960
 /usr/local/bin/ectool rgbkbd 9 65280
